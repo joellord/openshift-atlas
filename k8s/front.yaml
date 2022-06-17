@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mern-k8s-front
+  labels:
+    app: mern-k8s
+    component: front
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      component: front
+  template:
+    metadata: 
+      labels:
+        app: mern-k8s
+        component: front
+    spec:
+      containers:
+        - name: mern-k8s-front
+          image: joellord/mern-k8s-front-rootless
+          ports: 
+            - containerPort: 8080
+          env: 
+            - name: BASE_URL
+              value: "http://api.mern-k8s.com"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mern-k8s-front
+  labels:
+    app: mern-k8s
+    component: front
+spec:
+  selector:
+    component: front
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http
