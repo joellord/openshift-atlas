@@ -1,3 +1,9 @@
+# Using MongoDB in OpenShift
+
+This document provides the instructions to use MongoDB in an OpenShift cluster.
+
+## Setup
+
 Create a developer sandbox and install the `oc` cli tool.
 
 From the OpenShift UI, click on your username in the upper right corner. From the dropdown, select `Copy Login Command`. This will open up a new browser tab. Click on "Display Tokens", and look for the `oc` command to login. Copy this command and paste it in your terminal.
@@ -11,6 +17,8 @@ From the terminal, select a project to work on.
 ```
 oc project %USERNAME%-dev
 ```
+
+## Deploy a demo app
 
 Create the new application back-end.
 
@@ -52,6 +60,8 @@ oc set env deployment/mern-k8s-front BASE_URL=http://$(oc get routes | awk 'FNR=
 ```
 
 The application is now created, but we need to connect the Atlas cluster to OpenShift, and use this new AtlasCluster object to provide us with a connection string. 
+
+## Using the Atlas Operator
 
 From the Atlas UI, get your organization id, create a new API key, and save those credentials in your terminal session. You can use the built-in terminal in OpenShift to run these commands.
 
@@ -135,3 +145,36 @@ Click "Save". This will bring you back to the topology view, and voila! You will
 
 You can add a new entry in the guestbook. Refresh the page to show it persisted. Open the Atlas UI in the newly created cluster, and show the data.
 
+## Using the RHODA operator
+
+This operator backed by Red Hat provides you with an easy way to connect to various DBaaS services.
+
+From the left navigation bar, click on +Add. Click on the "All Services" card under the "Developer Catalog" section.
+
+This will open up the "Developer Catalog". In the search bar, enter "Provider Account", and scroll down to find the "Provider Account" card. Click on it to open the side panel, and click on "Create".
+
+In this new screen, fill in the form with the following values.
+
+Database provider: MongoDB Atlas Cloud Database Service
+Organization ID: Your org Id
+Public API Key: You public API key
+Private API Key: Your private API key
+Name: openshift-mongodb
+
+You should see a success message, along with a list of all of your MongoDB projects.
+
+From the +Add menu again, go to "All Services" in "Developer Catalog", and seach for "Atlas". Scroll down and pick "MongoDB Atlas Cloud Database Service". Click on "Add to Topology".
+
+From the Provider Account dropdown, pick openshift-mongodb. Then pick a database from the list below. If you followed the Atlas Operator steps, you should have a "test-cluster" available to you. Click on "Add to Topology".
+
+From the Topology view, you should now see the Database as a Service Connection (DBSC).
+
+Note: For this part, you will need to change the base image for the back end server. This new image uses the same code, but uses the Kubernetes Service Bindings plugins. I added the code for the back-end before and after to this repo so you can compare both files. They are very similar. To use this new image, click on the mern-k8s-back icon in the Topology view. From the Actions dropdown, choose "Edit Deployment". In the Form View, look for the Image name and change it from joellord/mern-k8s-back to
+Image Name: joellord/mern-k8s-back-binding
+This will redeploy the app with this new image.
+
+Back to the topology view with the new image, hover the "mern-k8s-back" icon. You will see a dotted arrow. Hover that arrow, then drag and drop it inside the square area of the DBSC (just the grey area, not the icon inside of it).
+
+A modal will popup, click on Create to create the service bindings.
+
+The application will redeploy with the new service bindings.
