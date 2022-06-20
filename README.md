@@ -79,7 +79,7 @@ oc create secret generic openshift-mongodb \
     --from-literal="publicApiKey=$ATLAS_PUBLIC_KEY" \
     --from-literal="privateApiKey=$ATLAS_PRIVATE_KEY"
 
-oc label secret mongodb-atlas-operator-api-key atlas.mongodb.com/type=credentials 
+oc label secret openshift-mongodb atlas.mongodb.com/type=credentials 
 ```
 
 Also, you will need to create a password for the Atlas User you will create later.
@@ -99,7 +99,6 @@ Search for "Atlas", click on the Card titled "Atlas Project". A side panel will 
 Keep the default values for the names and labels. 
 Click on Connect Secret Ref and in the text box, enter `openshift-mongodb`, which is the name of the secret you just created.
 Click on the Project Ip Access List and in the Ip Address field, enter `0.0.0.0`.
-Create a user password to be used with the database. 
 
 Your Atlas Project is created, you can now go and create a cluster in that project.
 
@@ -113,7 +112,7 @@ Backing Provider Name: AWS
 
 You can keep all the other default values.
 
-If you go to your MongoDB Atlas account, you should now see a "Test Atlas Operator" project, and a "test-cluster" that is being deployed. 
+If you go to your MongoDB Atlas account, you should now see a "Test Atlas Operator" project, and a "test-cluster" that is being provisioned. 
 
 Finally, you need to create a new Atlas Database User. Click +Add, find the "All Services" under the "Developer Catalog", search for "Atlas", click on "Atlas Database User", and click on Create.
 
@@ -165,7 +164,24 @@ You should see a success message, along with a list of all of your MongoDB proje
 
 From the +Add menu again, go to "All Services" in "Developer Catalog", and seach for "Atlas". Scroll down and pick "MongoDB Atlas Cloud Database Service". Click on "Add to Topology".
 
-From the Provider Account dropdown, pick openshift-mongodb. Then pick a database from the list below. If you followed the Atlas Operator steps, you should have a "test-cluster" available to you. Click on "Add to Topology".
+Note: If you don't want to create a new database, you should be able to use the one you created with the Atlas operator.
+
+From the Provider Account dropdown, pick openshift-mongodb. Then, click on the "Create New Database Instance" on the right side, just above the list of existing databases.
+
+In the "Create New Instance" form, use the following values.
+
+Database Provider: MongoDB Atlas Cloud Database Service
+Provider Account: openshift-mongodb
+Instance Name: my-new-instance
+Project Name: my-new-project
+
+In Atlas, you should now see a new project called my-new-project (you might need to fresh the page). If you select that project, you will see a new cluster called my-new-instance being created.
+
+Note: You will need to wait 2-3 minutes for the cluster to be deployed.
+
+Once again, from the +Add menu, go to "All Services" in "Developer Catalog", seach for "Atlas", and pick "MongoDB Atlas Cloud Database Service". Click on "Add to Topology".
+
+In the Provider Account dropdown, pick "openshift-mongodb". From the list of available database instances, pick the newly created "my-new-instance". Click on Add to Topology.
 
 From the Topology view, you should now see the Database as a Service Connection (DBSC).
 
@@ -178,3 +194,7 @@ Back to the topology view with the new image, hover the "mern-k8s-back" icon. Yo
 A modal will popup, click on Create to create the service bindings.
 
 The application will redeploy with the new service bindings.
+
+Everything should now work again.
+
+Note: In order to use this new cluster, you will need to create a "mern-k8s" database and a "entries" collection in your cluster.
