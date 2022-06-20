@@ -15,13 +15,12 @@ metadata:
 spec:
   projectRef:
     name: mern-k8s-project
-  clusterSpec:
-    name: "Cluster0"
-    providerSettings:
-      instanceSizeName: M0
-      providerName: TENANT
-      regionName: US_EAST_1
-      backingProviderName: AWS
+  name: "Cluster0"
+  providerSettings:
+    instanceSizeName: M0
+    providerName: TENANT
+    regionName: US_EAST_1
+    backingProviderName: AWS
 ---
 apiVersion: atlas.mongodb.com/v1
 kind: AtlasDatabaseUser
